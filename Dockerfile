@@ -1,32 +1,35 @@
-FROM ubuntu
-MAINTAINER Christian Lück <christian@lueck.tv>
+FROM alpine:3.12.1
+MAINTAINER alex4401 <rylatgl@gmail.com>
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
-  nginx php5-fpm supervisor \
-  wget unzip patch
+ENV H5AI_VERSION=0.29.2
+ENV TS=Europe/Warsaw
+
+RUN apk --update --no-cache add \
+    wget supervisor unzip patch nginx \
+    php7 php7-fpm php7-opcache php7-gd && \
+    rm /etc/nginx/conf.d/default.conf
 
 # install h5ai and patch configuration
-RUN wget http://release.larsjung.de/h5ai/h5ai-0.24.1.zip
-RUN unzip h5ai-0.24.1.zip -d /usr/share/h5ai
+RUN apk --update --no-cache add ca-certificates && \
+    wget https://release.larsjung.de/h5ai/h5ai-$H5AI_VERSION.zip && \
+    unzip h5ai-$H5AI_VERSION.zip -d /usr/share/h5ai && \
+    rm h5ai-$H5AI_VERSION.zip
 
-# patch h5ai because we want to deploy it ouside of the document root and use /var/www as root for browsing
-ADD App.php.patch App.php.patch
-RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/server/php/inc/ -i /App.php.patch && rm App.php.patch
-
+# patch h5ai
+ADD h5ai-class-setup.patch
+RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/php/core -i /class-setup.php.patch && rm class-setup.php.patch
 ADD options.json.patch options.json.patch
-RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/conf/ -i /options.json.patch && rm options.json.patch
+RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/conf/ -i /options.json.patch && rm options.json.patch
 
 # add h5ai as the only nginx site
-ADD h5ai.nginx.conf /etc/nginx/sites-available/h5ai
-RUN ln -s /etc/nginx/sites-available/h5ai /etc/nginx/sites-enabled/h5ai
-RUN rm /etc/nginx/sites-enabled/default
+ADD nginx.conf /etc/nginx/nginx.conf
+ADD fpm-pool.conf /etc/php7/php-fpm.d/www.conf
+ADD php.ini /etc/php7/conf.d/custom.ini
 
+RUN chown -R nobody:nobody /usr/share/h5ai
+
+USER nobody
 WORKDIR /var/www
-
-# add dummy files in case the container is not run with a volume mounted to /var/www
-RUN echo "Looks like you did not mount a volume to `/var/www`. See README.md for details." > /var/www/INSTALL.md
-RUN mkdir -p /var/www/first/second/third/fourth/fifth
-ADD README.md /var/www/README.md
 
 # use supervisor to monitor all services
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf

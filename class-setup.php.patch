@@ -1,0 +1,11 @@
+--- a/class-setup.php	2019-03-22 02:35:08.000000000 +0100
++++ b/class-setup.php	2020-11-04 12:35:37.080094431 +0100
+@@ -99,7 +99,7 @@
+         $this->set('H5AI_PATH', Util::normalize_path(dirname(dirname(dirname(dirname(__FILE__)))), false));
+ 
+         $this->set('ROOT_HREF', Util::normalize_path(dirname($this->get('H5AI_HREF')), true));
+-        $this->set('ROOT_PATH', Util::normalize_path(dirname($this->get('H5AI_PATH')), false));
++        $this->set('ROOT_PATH', '/var/www');
+ 
+         $this->set('PUBLIC_HREF', Util::normalize_path($this->get('H5AI_HREF') . '/public/', true));
+         $this->set('PUBLIC_PATH', Util::normalize_path($this->get('H5AI_PATH') . '/public/', false));
