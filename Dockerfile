@@ -1,5 +1,15 @@
-FROM alpine:3.12.1
+FROM alpine AS builder
+
+# Download QEMU, see https://github.com/docker/hub-feedback/issues/1261
+ENV QEMU_URL https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz
+RUN apk add curl && curl -L ${QEMU_URL} | tar zxvf - -C . --strip-components 1
+
+
+FROM arm32v7/alpine:3.12.1
 MAINTAINER alex4401 <rylatgl@gmail.com>
+
+# Add QEMU
+COPY --from=builder qemu-arm-static /usr/bin
 
 ENV H5AI_VERSION=0.29.2
 ENV TS=Europe/Warsaw
@@ -16,7 +26,7 @@ RUN apk --update --no-cache add ca-certificates && \
     rm h5ai-$H5AI_VERSION.zip
 
 # patch h5ai
-ADD h5ai-class-setup.patch
+ADD h5ai-class-setup.patch h5ai-class-setup.patch
 RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/php/core -i /class-setup.php.patch && rm class-setup.php.patch
 ADD options.json.patch options.json.patch
 RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/conf/ -i /options.json.patch && rm options.json.patch
