@@ -15,8 +15,9 @@ ENV H5AI_VERSION=0.29.2
 ENV TS=Europe/Warsaw
 
 RUN apk --update --no-cache add \
-    wget supervisor unzip patch nginx \
-    php7 php7-fpm php7-opcache php7-gd php7-session && \
+    wget supervisor unzip patch nginx tzdata \
+    php7 php7-fpm php7-opcache php7-gd php7-session php7-json php-intl \
+    php7-imagick imagemagick ffmpeg php7-zip php7-mbstring php7-xml php7-exif && \
     rm /etc/nginx/conf.d/default.conf
 
 # install h5ai and patch configuration
