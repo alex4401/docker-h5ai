@@ -16,7 +16,7 @@ ENV TS=Europe/Warsaw
 
 RUN apk --update --no-cache add \
     wget supervisor unzip patch nginx \
-    php7 php7-fpm php7-opcache php7-gd && \
+    php7 php7-fpm php7-opcache php7-gd php7-session && \
     rm /etc/nginx/conf.d/default.conf
 
 # install h5ai and patch configuration
