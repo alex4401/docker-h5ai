@@ -36,8 +36,11 @@ ADD nginx.conf /etc/nginx/nginx.conf
 ADD fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 ADD php.ini /etc/php7/conf.d/custom.ini
 
-RUN chown -R nobody:nobody /usr/share/h5ai
-
+RUN mkdir /run/php && \
+    chown -R nobody:nobody /usr/share/h5ai && \
+    chown -R nobody:nobody /run/php && \
+    chown -R nobody:nobody /var/lib/nginx && \
+    chown -R nobody:nobody /var/log/nginx
 USER nobody
 WORKDIR /var/www
 
