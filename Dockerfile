@@ -26,7 +26,7 @@ RUN apk --update --no-cache add ca-certificates && \
     rm h5ai-$H5AI_VERSION.zip
 
 # patch h5ai
-ADD h5ai-class-setup.patch h5ai-class-setup.patch
+ADD class-setup.php.patch class-setup.php.patch
 RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/php/core -i /class-setup.php.patch && rm class-setup.php.patch
 ADD options.json.patch options.json.patch
 RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/conf/ -i /options.json.patch && rm options.json.patch
