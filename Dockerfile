@@ -29,8 +29,8 @@ RUN apk --update --no-cache add ca-certificates && \
 # patch h5ai
 ADD class-setup.php.patch class-setup.php.patch
 RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/php/core -i /class-setup.php.patch && rm class-setup.php.patch
-ADD options.json.patch options.json.patch
-RUN patch -p1 -u -d /usr/share/h5ai/_h5ai/private/conf/ -i /options.json.patch && rm options.json.patch
+ADD options.json options.json
+RUN mv options.json /usr/share/h5ai/_h5ai/private/conf/options.json
 
 # add h5ai as the only nginx site
 ADD nginx.conf /etc/nginx/nginx.conf
